@@ -148,7 +148,7 @@ function VideoRoom() {
 
   // Initialize socket connection
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const newSocket = io('http://localhost:5001');
     setSocket(newSocket);
 
     return () => {
