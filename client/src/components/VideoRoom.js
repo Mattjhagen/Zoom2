@@ -280,7 +280,7 @@ function VideoRoom() {
     return peerConnection;
   }, [localStream, socket, roomId]);
 
-  const handleOfferReceived = async (data) => {
+  const handleOfferReceived = useCallback(async (data) => {
     const { offer, fromUserId } = data;
     const peerConnection = await createPeerConnection(fromUserId);
     
@@ -293,23 +293,23 @@ function VideoRoom() {
       roomId: roomId,
       targetUserId: fromUserId
     });
-  };
+  }, [createPeerConnection, socket, roomId]);
 
-  const handleAnswerReceived = async (data) => {
+  const handleAnswerReceived = useCallback(async (data) => {
     const { answer, fromUserId } = data;
     const peerConnection = peerConnections.current.get(fromUserId);
     if (peerConnection) {
       await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
     }
-  };
+  }, []);
 
-  const handleIceCandidateReceived = async (data) => {
+  const handleIceCandidateReceived = useCallback(async (data) => {
     const { candidate, fromUserId } = data;
     const peerConnection = peerConnections.current.get(fromUserId);
     if (peerConnection) {
       await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     }
-  };
+  }, []);
 
   // Send offer to new user
   useEffect(() => {
