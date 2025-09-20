@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Video, Users, Plus, LogIn } from 'lucide-react';
+import { Video, Plus, LogIn } from 'lucide-react';
 
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.1);

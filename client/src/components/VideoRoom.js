@@ -241,7 +241,7 @@ function VideoRoom() {
       socket.off('answer', handleAnswer);
       socket.off('ice-candidate', handleIceCandidate);
     };
-  }, [socket]);
+  }, [socket, handleOfferReceived, handleAnswerReceived, handleIceCandidateReceived]);
 
   // WebRTC functions
   const createPeerConnection = useCallback(async (userId) => {

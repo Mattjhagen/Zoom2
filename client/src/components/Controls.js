@@ -7,7 +7,6 @@ import {
   VideoOff, 
   Monitor, 
   MonitorOff, 
-  Phone, 
   PhoneOff 
 } from 'lucide-react';
 
