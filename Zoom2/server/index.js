@@ -148,12 +148,34 @@ io.on('connection', (socket) => {
 });
 
 // Serve static files from React build directory
-const buildPath = path.join(__dirname, '../client/build');
-if (require('fs').existsSync(buildPath)) {
-  console.log('✅ Serving static files from React build directory');
+const buildPaths = [
+  path.join(__dirname, '../client/build'),
+  path.join(__dirname, '../../client/build'),
+  path.join(process.cwd(), 'client/build'),
+  path.join(process.cwd(), '../client/build'),
+  path.join('/opt/render/project/client/build'),
+  path.join('/opt/render/project/src/client/build')
+];
+
+let buildPath = null;
+for (const bp of buildPaths) {
+  if (require('fs').existsSync(bp)) {
+    buildPath = bp;
+    break;
+  }
+}
+
+if (buildPath) {
+  console.log(`✅ Serving static files from React build directory: ${buildPath}`);
   app.use(express.static(buildPath));
 } else {
   console.log('⚠️  React build directory not found, serving from public directory');
+  console.log('Available directories:');
+  console.log('Current working directory:', process.cwd());
+  console.log('Server directory:', __dirname);
+  require('fs').readdirSync(process.cwd()).forEach(dir => {
+    console.log('-', dir);
+  });
   app.use(express.static(path.join(__dirname, '../public')));
 }
 
