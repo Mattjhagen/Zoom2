@@ -17,6 +17,9 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from public directory as fallback
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Serve static files from the React app build directory
 if (process.env.NODE_ENV === 'production') {
   // Try multiple possible build locations for Render
@@ -191,9 +194,17 @@ if (process.env.NODE_ENV === 'production') {
       }
     }
     
-    console.log('❌ index.html not found. Tried paths:');
+    console.log('❌ React build not found. Tried paths:');
     indexPaths.forEach(p => console.log('-', p));
-    res.status(404).send('Frontend build not found. Check server logs for details.');
+    
+    // Fallback to public/index.html
+    const fallbackPath = path.join(__dirname, '../public/index.html');
+    if (require('fs').existsSync(fallbackPath)) {
+      console.log('✅ Serving fallback index.html from public directory');
+      return res.sendFile(fallbackPath);
+    }
+    
+    res.status(404).send('Frontend not available. Check server logs for details.');
   });
 }
 
