@@ -28,6 +28,15 @@ app.get('/api/test', (req, res) => {
   res.json({ success: true, message: 'API is working!' });
 });
 
+app.get('/api/rooms', (req, res) => {
+  const roomsList = Array.from(rooms.values()).map(room => ({
+    id: room.id,
+    participantCount: room.participants.size,
+    createdAt: room.createdAt
+  }));
+  res.json(roomsList);
+});
+
 app.post('/api/rooms', (req, res) => {
   console.log('POST /api/rooms called with body:', req.body);
   const { roomId } = req.body;
