@@ -38,22 +38,27 @@ app.get('/api/rooms', (req, res) => {
 });
 
 app.post('/api/rooms', (req, res) => {
-  console.log('POST /api/rooms called with body:', req.body);
-  const { roomId } = req.body;
-  const id = roomId || uuidv4().substring(0, 6).toUpperCase();
-  
-  if (!rooms.has(id)) {
-    rooms.set(id, {
-      id,
-      participants: new Set(),
-      createdAt: new Date()
-    });
-    console.log(`Created new room: ${id}`);
-  } else {
-    console.log(`Room ${id} already exists`);
+  try {
+    console.log('POST /api/rooms called with body:', req.body);
+    const { roomId } = req.body;
+    const id = roomId || uuidv4().substring(0, 6).toUpperCase();
+    
+    if (!rooms.has(id)) {
+      rooms.set(id, {
+        id,
+        participants: new Set(),
+        createdAt: new Date()
+      });
+      console.log(`Created new room: ${id}`);
+    } else {
+      console.log(`Room ${id} already exists`);
+    }
+    
+    res.json({ success: true, roomId: id });
+  } catch (error) {
+    console.error('Error creating room:', error);
+    res.status(500).json({ success: false, error: 'Failed to create room' });
   }
-  
-  res.json({ success: true, roomId: id });
 });
 
 app.get('/api/rooms/:roomId', (req, res) => {
@@ -154,7 +159,11 @@ const buildPaths = [
   path.join(process.cwd(), 'client/build'),
   path.join(process.cwd(), '../client/build'),
   path.join('/opt/render/project/client/build'),
-  path.join('/opt/render/project/src/client/build')
+  path.join('/opt/render/project/src/client/build'),
+  path.join('/opt/render/project/src/Zoom2/client/build'),
+  path.join('/opt/render/project/Zoom2/client/build'),
+  path.join(process.cwd(), 'Zoom2/client/build'),
+  path.join(process.cwd(), '../Zoom2/client/build')
 ];
 
 let buildPath = null;
@@ -196,8 +205,12 @@ app.get('*', (req, res) => {
       path.join(process.cwd(), 'src/client/build/index.html'),
       path.join(process.cwd(), '../client/build/index.html'),
       path.join(process.cwd(), '../../client/build/index.html'),
-      path.join('/opt/render/project/src/client/build/index.html'), // Render specific path
-      path.join('/opt/render/project/client/build/index.html') // Render specific path
+      path.join('/opt/render/project/src/client/build/index.html'),
+      path.join('/opt/render/project/client/build/index.html'),
+      path.join('/opt/render/project/src/Zoom2/client/build/index.html'),
+      path.join('/opt/render/project/Zoom2/client/build/index.html'),
+      path.join(process.cwd(), 'Zoom2/client/build/index.html'),
+      path.join(process.cwd(), '../Zoom2/client/build/index.html')
     ];
     
     for (const indexPath of indexPaths) {
