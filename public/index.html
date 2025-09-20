@@ -114,6 +114,56 @@
             color: #FFC107;
             font-size: 0.9rem;
         }
+        
+        .room-actions {
+            margin: 2em 0;
+            text-align: center;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .join-section {
+            margin-top: 1.5em;
+        }
+        
+        .room-input {
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+            margin-right: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        
+        .room-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .room-input:focus {
+            outline: none;
+            border-color: #28a745;
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -143,9 +193,70 @@
             </ul>
         </div>
         
+        <div class="room-actions">
+            <button onclick="createRoom()" class="action-btn create-btn">
+                🎥 Create New Room
+            </button>
+            <div class="join-section">
+                <input type="text" id="roomId" placeholder="Enter Room ID" class="room-input">
+                <button onclick="joinRoom()" class="action-btn join-btn">
+                    🚪 Join Room
+                </button>
+            </div>
+        </div>
+        
         <div class="note">
-            <p><strong>Note:</strong> Frontend build is being optimized. Backend API and Socket.io are fully functional. Full React app will be available shortly!</p>
+            <p><strong>Note:</strong> Full React app is loading. This is a temporary interface while the main app loads!</p>
         </div>
     </div>
+    
+    <script>
+        function createRoom() {
+            // Generate a random room ID
+            const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            // Create room via API
+            fetch('/api/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ roomId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the room
+                    window.location.href = `/room/${roomId}`;
+                } else {
+                    alert('Failed to create room. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating room:', error);
+                // Fallback: redirect anyway (room will be created on join)
+                window.location.href = `/room/${roomId}`;
+            });
+        }
+        
+        function joinRoom() {
+            const roomId = document.getElementById('roomId').value.trim();
+            
+            if (!roomId) {
+                alert('Please enter a room ID');
+                return;
+            }
+            
+            // Redirect to the room
+            window.location.href = `/room/${roomId}`;
+        }
+        
+        // Allow Enter key to join room
+        document.getElementById('roomId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinRoom();
+            }
+        });
+    </script>
 </body>
 </html>
