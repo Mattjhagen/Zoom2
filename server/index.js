@@ -29,7 +29,8 @@ if (process.env.NODE_ENV === 'production') {
     path.join(__dirname, '../build'),
     path.join(__dirname, '../../build'),
     path.join(process.cwd(), 'client/build'),
-    path.join(process.cwd(), 'build')
+    path.join(process.cwd(), 'build'),
+    path.join(process.cwd(), 'src/client/build')
   ];
   
   let staticPath = null;
@@ -184,7 +185,8 @@ if (process.env.NODE_ENV === 'production') {
       path.join(__dirname, '../build/index.html'),
       path.join(__dirname, '../../build/index.html'),
       path.join(process.cwd(), 'client/build/index.html'),
-      path.join(process.cwd(), 'build/index.html')
+      path.join(process.cwd(), 'build/index.html'),
+      path.join(process.cwd(), 'src/client/build/index.html')
     ];
     
     for (const indexPath of indexPaths) {
