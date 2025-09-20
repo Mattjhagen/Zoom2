@@ -154,6 +154,10 @@ io.on('connection', (socket) => {
 
 // Serve static files from React build directory
 const buildPaths = [
+  // Check root directory first (where build files are copied)
+  path.join(__dirname, '..'),
+  path.join(process.cwd()),
+  // Then check client/build directories
   path.join(__dirname, '../client/build'),
   path.join(__dirname, '../../client/build'),
   path.join(process.cwd(), 'client/build'),
@@ -174,8 +178,13 @@ const buildPaths = [
 let buildPath = null;
 for (const bp of buildPaths) {
   if (require('fs').existsSync(bp)) {
-    buildPath = bp;
-    break;
+    // Check if this is a React build directory (contains index.html and static folder)
+    const indexPath = path.join(bp, 'index.html');
+    const staticPath = path.join(bp, 'static');
+    if (require('fs').existsSync(indexPath) && require('fs').existsSync(staticPath)) {
+      buildPath = bp;
+      break;
+    }
   }
 }
 
@@ -205,6 +214,10 @@ app.get('*', (req, res) => {
   }
     // Try multiple possible index.html locations
     const indexPaths = [
+      // Check root directory first (where build files are copied)
+      path.join(__dirname, '../index.html'),
+      path.join(process.cwd(), 'index.html'),
+      // Then check client/build directories
       path.join(__dirname, '../client/build/index.html'),
       path.join(__dirname, '../../client/build/index.html'),
       path.join(__dirname, '../build/index.html'),
