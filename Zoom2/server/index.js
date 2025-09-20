@@ -94,14 +94,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('offer', (data) => {
+    // Send offer to all users in the room except the sender
     socket.to(data.roomId).emit('offer', data);
   });
 
   socket.on('answer', (data) => {
+    // Send answer to all users in the room except the sender
     socket.to(data.roomId).emit('answer', data);
   });
 
   socket.on('ice-candidate', (data) => {
+    // Send ICE candidate to all users in the room except the sender
     socket.to(data.roomId).emit('ice-candidate', data);
   });
 
@@ -112,6 +115,13 @@ io.on('connection', (socket) => {
     // Remove user from room
     if (rooms.has(roomId)) {
       rooms.get(roomId).participants.delete(userId);
+    }
+  });
+
+  socket.on('get-existing-users', (roomId) => {
+    if (rooms.has(roomId)) {
+      const existingUsers = Array.from(rooms.get(roomId).participants);
+      socket.emit('existing-users', existingUsers);
     }
   });
 });

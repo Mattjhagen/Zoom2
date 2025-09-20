@@ -264,6 +264,10 @@ const VideoRoom = () => {
       console.log('User connected:', userId);
       setParticipants(prev => prev + 1);
       createPeerConnection(userId);
+      // Send offer to the new user
+      setTimeout(() => {
+        sendOffer(userId);
+      }, 1000); // Small delay to ensure peer connection is established
     };
 
     const handleUserDisconnected = (userId) => {
@@ -299,12 +303,25 @@ const VideoRoom = () => {
       setMessages(prev => [...prev, data]);
     };
 
+    const handleExistingUsers = (existingUsers) => {
+      console.log('Existing users:', existingUsers);
+      existingUsers.forEach(userId => {
+        if (userId !== userName) { // Don't create connection to self
+          createPeerConnection(userId);
+          setTimeout(() => {
+            sendOffer(userId);
+          }, 1000);
+        }
+      });
+    };
+
     socket.on('user-connected', handleUserConnected);
     socket.on('user-disconnected', handleUserDisconnected);
     socket.on('offer', handleOffer);
     socket.on('answer', handleAnswer);
     socket.on('ice-candidate', handleIceCandidate);
     socket.on('receive-message', handleMessage);
+    socket.on('existing-users', handleExistingUsers);
 
     return () => {
       socket.off('user-connected', handleUserConnected);
@@ -313,8 +330,9 @@ const VideoRoom = () => {
       socket.off('answer', handleAnswer);
       socket.off('ice-candidate', handleIceCandidate);
       socket.off('receive-message', handleMessage);
+      socket.off('existing-users', handleExistingUsers);
     };
-  }, [socket]);
+  }, [socket, createPeerConnection, sendOffer, handleAnswerReceived, handleIceCandidateReceived, handleOfferReceived, userName]);
 
   // Join room when socket is ready
   useEffect(() => {
@@ -322,6 +340,14 @@ const VideoRoom = () => {
       socket.emit('join-room', roomId, userName);
     }
   }, [socket, roomId, userName]);
+
+  // Send offers to existing users when local stream is ready
+  useEffect(() => {
+    if (localStream && socket && roomId) {
+      // Get existing participants and send offers to them
+      socket.emit('get-existing-users', roomId);
+    }
+  }, [localStream, socket, roomId]);
 
   // Create peer connection
   const createPeerConnection = useCallback((userId) => {
