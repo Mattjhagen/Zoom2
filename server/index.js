@@ -19,7 +19,21 @@ app.use(express.json());
 
 // Serve static files from the React app build directory
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // Try multiple possible build locations
+  const buildPaths = [
+    path.join(__dirname, '../client/build'),
+    path.join(__dirname, '../../client/build'),
+    path.join(__dirname, '../build'),
+    path.join(__dirname, '../../build')
+  ];
+  
+  for (const buildPath of buildPaths) {
+    if (require('fs').existsSync(buildPath)) {
+      app.use(express.static(buildPath));
+      console.log(`Serving static files from: ${buildPath}`);
+      break;
+    }
+  }
 }
 
 // Store active rooms
@@ -147,7 +161,21 @@ app.post('/api/rooms', (req, res) => {
 // Catch all handler: send back React's index.html file for any non-API routes
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    // Try multiple possible index.html locations
+    const indexPaths = [
+      path.join(__dirname, '../client/build/index.html'),
+      path.join(__dirname, '../../client/build/index.html'),
+      path.join(__dirname, '../build/index.html'),
+      path.join(__dirname, '../../build/index.html')
+    ];
+    
+    for (const indexPath of indexPaths) {
+      if (require('fs').existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+    }
+    
+    res.status(404).send('Frontend build not found');
   });
 }
 
