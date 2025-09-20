@@ -224,7 +224,10 @@ const VideoRoom = () => {
 
   // Initialize socket connection
   useEffect(() => {
-    const newSocket = io('http://localhost:5001');
+    const socketUrl = process.env.NODE_ENV === 'production' 
+      ? window.location.origin 
+      : 'http://localhost:5001';
+    const newSocket = io(socketUrl);
     setSocket(newSocket);
 
     return () => {

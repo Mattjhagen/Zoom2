@@ -147,12 +147,22 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve static files from public directory as fallback (after React build)
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files from React build directory
+const buildPath = path.join(__dirname, '../client/build');
+if (require('fs').existsSync(buildPath)) {
+  console.log('✅ Serving static files from React build directory');
+  app.use(express.static(buildPath));
+} else {
+  console.log('⚠️  React build directory not found, serving from public directory');
+  app.use(express.static(path.join(__dirname, '../public')));
+}
 
 // Catch all handler: send back React's index.html file for any non-API routes
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
+app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
     // Try multiple possible index.html locations
     const indexPaths = [
       path.join(__dirname, '../client/build/index.html'),
@@ -186,8 +196,7 @@ if (process.env.NODE_ENV === 'production') {
     }
     
     res.status(404).send('Frontend not available. Check server logs for details.');
-  });
-}
+});
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

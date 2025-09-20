@@ -10,7 +10,8 @@
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "build": "cd client && npm run build",
     "start": "cd server && npm start",
-    "heroku-postbuild": "npm run install-all && npm run build"
+    "heroku-postbuild": "npm run install-all && npm run build",
+    "render-postbuild": "npm run install-all && npm run build"
   },
   "keywords": ["video", "conferencing", "zoom", "webrtc", "socket.io"],
   "author": "Your Name",
