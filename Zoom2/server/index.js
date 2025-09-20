@@ -163,7 +163,12 @@ const buildPaths = [
   path.join('/opt/render/project/src/Zoom2/client/build'),
   path.join('/opt/render/project/Zoom2/client/build'),
   path.join(process.cwd(), 'Zoom2/client/build'),
-  path.join(process.cwd(), '../Zoom2/client/build')
+  path.join(process.cwd(), '../Zoom2/client/build'),
+  // Additional Render paths
+  path.join('/opt/render/project/build'),
+  path.join('/opt/render/project/src/build'),
+  path.join(process.cwd(), 'build'),
+  path.join(process.cwd(), '../build')
 ];
 
 let buildPath = null;
@@ -182,9 +187,13 @@ if (buildPath) {
   console.log('Available directories:');
   console.log('Current working directory:', process.cwd());
   console.log('Server directory:', __dirname);
-  require('fs').readdirSync(process.cwd()).forEach(dir => {
-    console.log('-', dir);
-  });
+  try {
+    require('fs').readdirSync(process.cwd()).forEach(dir => {
+      console.log('-', dir);
+    });
+  } catch (error) {
+    console.log('Error reading directory:', error.message);
+  }
   app.use(express.static(path.join(__dirname, '../public')));
 }
 
@@ -210,7 +219,12 @@ app.get('*', (req, res) => {
       path.join('/opt/render/project/src/Zoom2/client/build/index.html'),
       path.join('/opt/render/project/Zoom2/client/build/index.html'),
       path.join(process.cwd(), 'Zoom2/client/build/index.html'),
-      path.join(process.cwd(), '../Zoom2/client/build/index.html')
+      path.join(process.cwd(), '../Zoom2/client/build/index.html'),
+      // Additional Render paths
+      path.join('/opt/render/project/build/index.html'),
+      path.join('/opt/render/project/src/build/index.html'),
+      path.join(process.cwd(), 'build/index.html'),
+      path.join(process.cwd(), '../build/index.html')
     ];
     
     for (const indexPath of indexPaths) {
