@@ -19,20 +19,33 @@ app.use(express.json());
 
 // Serve static files from the React app build directory
 if (process.env.NODE_ENV === 'production') {
-  // Try multiple possible build locations
+  // Try multiple possible build locations for Render
   const buildPaths = [
     path.join(__dirname, '../client/build'),
     path.join(__dirname, '../../client/build'),
     path.join(__dirname, '../build'),
-    path.join(__dirname, '../../build')
+    path.join(__dirname, '../../build'),
+    path.join(process.cwd(), 'client/build'),
+    path.join(process.cwd(), 'build')
   ];
   
+  let staticPath = null;
   for (const buildPath of buildPaths) {
     if (require('fs').existsSync(buildPath)) {
       app.use(express.static(buildPath));
-      console.log(`Serving static files from: ${buildPath}`);
+      staticPath = buildPath;
+      console.log(`✅ Serving static files from: ${buildPath}`);
       break;
     }
+  }
+  
+  if (!staticPath) {
+    console.log('❌ No build directory found. Available directories:');
+    console.log('Current working directory:', process.cwd());
+    console.log('Server directory:', __dirname);
+    require('fs').readdirSync(process.cwd()).forEach(dir => {
+      console.log('-', dir);
+    });
   }
 }
 
@@ -166,16 +179,21 @@ if (process.env.NODE_ENV === 'production') {
       path.join(__dirname, '../client/build/index.html'),
       path.join(__dirname, '../../client/build/index.html'),
       path.join(__dirname, '../build/index.html'),
-      path.join(__dirname, '../../build/index.html')
+      path.join(__dirname, '../../build/index.html'),
+      path.join(process.cwd(), 'client/build/index.html'),
+      path.join(process.cwd(), 'build/index.html')
     ];
     
     for (const indexPath of indexPaths) {
       if (require('fs').existsSync(indexPath)) {
+        console.log(`✅ Serving index.html from: ${indexPath}`);
         return res.sendFile(indexPath);
       }
     }
     
-    res.status(404).send('Frontend build not found');
+    console.log('❌ index.html not found. Tried paths:');
+    indexPaths.forEach(p => console.log('-', p));
+    res.status(404).send('Frontend build not found. Check server logs for details.');
   });
 }
 
