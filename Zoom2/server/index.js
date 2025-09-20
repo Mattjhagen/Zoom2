@@ -58,10 +58,7 @@ app.get('/api/rooms/:roomId', (req, res) => {
   }
 });
 
-// Serve static files from public directory as fallback
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Serve static files from the React app build directory
+// Serve static files from the React app build directory first (in production)
 if (process.env.NODE_ENV === 'production') {
   // Try multiple possible build locations for Render
   const buildPaths = [
@@ -140,6 +137,9 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+// Serve static files from public directory as fallback (after React build)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Catch all handler: send back React's index.html file for any non-API routes
 if (process.env.NODE_ENV === 'production') {
