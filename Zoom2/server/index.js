@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:3000",
+    origin: process.env.NODE_ENV === 'production' ? ["https://www.cmameet.site", "https://cmameet.site"] : "http://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
@@ -24,7 +24,12 @@ app.use(express.json());
 const rooms = new Map();
 
 // API Routes
+app.get('/api/test', (req, res) => {
+  res.json({ success: true, message: 'API is working!' });
+});
+
 app.post('/api/rooms', (req, res) => {
+  console.log('POST /api/rooms called with body:', req.body);
   const { roomId } = req.body;
   const id = roomId || uuidv4().substring(0, 6).toUpperCase();
   
@@ -34,6 +39,9 @@ app.post('/api/rooms', (req, res) => {
       participants: new Set(),
       createdAt: new Date()
     });
+    console.log(`Created new room: ${id}`);
+  } else {
+    console.log(`Room ${id} already exists`);
   }
   
   res.json({ success: true, roomId: id });
