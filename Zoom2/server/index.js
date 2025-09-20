@@ -72,42 +72,6 @@ app.get('/api/rooms/:roomId', (req, res) => {
   }
 });
 
-// Serve static files from the React app build directory first (in production)
-if (process.env.NODE_ENV === 'production') {
-  // Try multiple possible build locations for Render
-  const buildPaths = [
-    path.join(__dirname, '../client/build'),
-    path.join(__dirname, '../../client/build'),
-    path.join(__dirname, '../build'),
-    path.join(__dirname, '../../build'),
-    path.join(process.cwd(), 'client/build'),
-    path.join(process.cwd(), 'build'),
-    path.join(process.cwd(), 'src/client/build'),
-    path.join(process.cwd(), '../client/build'),
-    path.join(process.cwd(), '../../client/build'),
-    path.join('/opt/render/project/src/client/build'), // Render specific path
-    path.join('/opt/render/project/client/build') // Render specific path
-  ];
-  
-  let staticPath = null;
-  for (const buildPath of buildPaths) {
-    if (require('fs').existsSync(buildPath)) {
-      app.use(express.static(buildPath));
-      staticPath = buildPath;
-      console.log(`✅ Serving static files from: ${buildPath}`);
-      break;
-    }
-  }
-  
-  if (!staticPath) {
-    console.log('❌ No build directory found. Available directories:');
-    console.log('Current working directory:', process.cwd());
-    console.log('Server directory:', __dirname);
-    require('fs').readdirSync(process.cwd()).forEach(dir => {
-      console.log('-', dir);
-    });
-  }
-}
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -152,7 +116,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve static files from React build directory
+// Serve static files from React build directory (after all API routes)
 const buildPaths = [
   // Check root directory first (where build files are copied)
   path.join(__dirname, '..'),
